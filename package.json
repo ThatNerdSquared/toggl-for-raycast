@@ -1,0 +1,35 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "toggl-unofficial",
+  "title": "Toggl Unofficial",
+  "description": "Start, stop, and view running Toggl timers! Not endorsed by Toggl in any way.",
+  "icon": "command-icon.png",
+  "author": "ThatNerd",
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "index",
+      "title": "Start Timer",
+      "subtitle": "",
+      "description": "Start a Toggl timer from a predefined list.",
+      "mode": "view"
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.25.3",
+    "node-fetch": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "~16.10.0",
+    "@types/react": "^17.0.28",
+    "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "@typescript-eslint/parser": "^5.0.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "typescript": "^4.4.3"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop"
+  }
+}

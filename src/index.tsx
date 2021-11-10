@@ -31,7 +31,6 @@ interface Project {
 async function itemChosen(item: Timer) {
 	const workspaceID: string = await getWorkspaceID()
 	const projects: Array<Project> = await getProjects(workspaceID)
-	console.log(projects)
 	let projectID = 0
 	projects.forEach(project => {
 			if (project.name == item.project) {

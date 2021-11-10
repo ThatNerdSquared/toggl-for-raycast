@@ -1,5 +1,13 @@
 import { ActionPanel, List } from "@raycast/api"
 import timers from "./timers"
+import { getProjects, getWorkspaceID } from "./toggl"
+
+async function itemChosen() {
+	const workspaceID: string = await getWorkspaceID()
+	console.log(workspaceID)
+	const projects = await getProjects(workspaceID)
+	console.log(projects)
+}
 
 const timerArray = timers.map(timer => {
 	return (
@@ -8,7 +16,7 @@ const timerArray = timers.map(timer => {
 			subtitle={timer.project}
 			actions={
 				<ActionPanel>
-					<ActionPanel.Item title="Start Timer" onAction={() => console.log("Close PR #1")} />
+					<ActionPanel.Item title="Start Timer" onAction={() => itemChosen()} />
 				</ActionPanel>
 			}
 		/>

@@ -30,47 +30,39 @@ interface Project {
 async function getProjects(workspaceID: string): Promise<Array<Project>> {
 	const prefs: Preferences = getPreferenceValues()
 	const baseURL = `https://api.track.toggl.com/api/v8/workspaces/${workspaceID}/projects`
-	const auth = "Basic " + new Buffer(prefs.apiToken + ":api_token").toString("base64");
-	let projects: Array<Project> = []
+	const auth = "Basic " + Buffer.from(prefs.apiToken + ":api_token").toString("base64");
 
-	await fetch(baseURL, {
+	const response = await fetch(baseURL, {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
 			"Authorization": auth
 		},
 	})
-	.then(response => response.json())
-	.then(response => {
-		projects = response
-	})
+	const projects: any = await response.json()
 	return projects
 }
 
 async function getWorkspaceID(): Promise<string> {
 	const prefs: Preferences = getPreferenceValues()
 	const baseURL = "https://api.track.toggl.com/api/v8/workspaces"
-	const auth = "Basic " + new Buffer(prefs.apiToken + ":api_token").toString("base64");
+	const auth = "Basic " + Buffer.from(prefs.apiToken + ":api_token").toString("base64");
 	
-	let workspaceID = ""
-
-	await fetch(baseURL, {
+	const response = await fetch(baseURL, {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",
 			"Authorization": auth
 		},
 	})
-	.then(response => response.json())
-	.then(response => {
-		workspaceID = response[0].id
-	})
+	const resJSON: any = await response.json()
+	const workspaceID = resJSON[0].id
 	return workspaceID
 }
 
 async function startTimer(timerObject: Timer) {
 	const prefs: Preferences = getPreferenceValues()
-	const auth = "Basic " + new Buffer(prefs.apiToken + ":api_token").toString("base64");
+	const auth = "Basic " + Buffer.from(prefs.apiToken + ":api_token").toString("base64");
 	const baseURL = "https://api.track.toggl.com/api/v8/time_entries/start"
 	const data = {
 		"time_entry": {

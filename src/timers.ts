@@ -12,7 +12,7 @@ const timers = [
 		"project": "Work"
 	},
 	{
-		"name": "Dev Work",
+		"name": "Automation",
 		"project": "Dev"
 	},
 	{

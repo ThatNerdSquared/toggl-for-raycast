@@ -1,4 +1,4 @@
-import { ActionPanel, List } from "@raycast/api"
+import { ActionPanel, List, showHUD } from "@raycast/api"
 import timers from "./timers"
 import { getProjects, getWorkspaceID, startTimer } from "./toggl"
 
@@ -31,6 +31,7 @@ interface Project {
 async function itemChosen(item: Timer) {
 	const workspaceID: string = await getWorkspaceID()
 	const projects: Array<Project> = await getProjects(workspaceID)
+	console.log(projects)
 	let projectID = 0
 	projects.forEach(project => {
 			if (project.name == item.project) {
@@ -43,7 +44,7 @@ async function itemChosen(item: Timer) {
 		"project": projectID
 	}
 	await startTimer(timeEntry)
-	showHUD
+	await showHUD(`Timer for "${item.name}" started! 🎉`)
 }
 
 const timerArray = timers.map(timer => {

@@ -27,7 +27,7 @@ interface Project {
 }
 
 
-async function getProjects(workspaceID: string): Array<Project> {
+async function getProjects(workspaceID: string): Promise<Array<Project>> {
 	const prefs: Preferences = getPreferenceValues()
 	const baseURL = `https://api.track.toggl.com/api/v8/workspaces/${workspaceID}/projects`
 	const auth = "Basic " + new Buffer(prefs.apiToken + ":api_token").toString("base64");

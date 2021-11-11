@@ -1,4 +1,4 @@
-import { ActionPanel, List, showHUD } from "@raycast/api"
+import { ActionPanel, Icon, List, showHUD } from "@raycast/api"
 import timers from "./timers"
 import { getProjects, getWorkspaceID, startTimer } from "./toggl"
 
@@ -49,11 +49,15 @@ async function itemChosen(item: Timer) {
 const timerArray = timers.map(timer => {
 	return (
 		<List.Item
+			icon={Icon.Clock}
 			title={timer.name}
-			subtitle={timer.project}
+			accessoryTitle={timer.project}
 			actions={
 				<ActionPanel>
-					<ActionPanel.Item title="Start Timer" onAction={() => itemChosen(timer)} />
+					<ActionPanel.Item
+						title="Start Timer"
+						onAction={() => itemChosen(timer)}
+					/>
 				</ActionPanel>
 			}
 		/>

@@ -29,45 +29,45 @@ interface Project {
 }
 
 async function itemChosen(item: Timer) {
-	const workspaceID: string = await getWorkspaceID()
-	const projects: Array<Project> = await getProjects(workspaceID)
-	let projectID = 0
-	projects.forEach(project => {
-			if (project.name == item.project) {
-				projectID = project.id
-			}
-		}
-	)
-	const timeEntry: TimeEntry = {
-		"name": item.name,
-		"project": projectID
-	}
-	await startTimer(timeEntry)
-	await showHUD(`Timer for "${item.name}" started! 🎉`)
+    const workspaceID: string = await getWorkspaceID()
+    const projects: Array<Project> = await getProjects(workspaceID)
+    let projectID = 0
+    projects.forEach(project => {
+        if (project.name == item.project) {
+            projectID = project.id
+        }
+    }
+    )
+    const timeEntry: TimeEntry = {
+        "name": item.name,
+        "project": projectID
+    }
+    await startTimer(timeEntry)
+    await showHUD(`Timer for "${item.name}" started! 🎉`)
 }
 
 const timerArray = timers.map(timer => {
-	return (
-		<List.Item
-			icon={Icon.Clock}
-			title={timer.name}
-			accessoryTitle={timer.project}
-			actions={
-				<ActionPanel>
-					<ActionPanel.Item
-						title="Start Timer"
-						onAction={() => itemChosen(timer)}
-					/>
-				</ActionPanel>
-			}
-		/>
-	)
+    return (
+        <List.Item
+            icon={Icon.Clock}
+            title={timer.name}
+            accessoryTitle={timer.project}
+            actions={
+                <ActionPanel>
+                    <ActionPanel.Item
+                        title='Start Timer'
+                        onAction={() => itemChosen(timer)}
+                    />
+                </ActionPanel>
+            }
+        />
+    )
 })
 
 export default function Command() {
-	return (
-		<List>
-			{timerArray}
-		</List>
-	)
+    return (
+        <List>
+            {timerArray}
+        </List>
+    )
 }

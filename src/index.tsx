@@ -55,7 +55,7 @@ const timerArray = timers.map(timer => {
             actions={
                 <ActionPanel>
                     <ActionPanel.Item
-                        title='Start Timer'
+                        title="Start Timer"
                         onAction={() => itemChosen(timer)}
                     />
                 </ActionPanel>

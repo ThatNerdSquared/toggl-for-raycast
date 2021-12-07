@@ -22,7 +22,7 @@ interface Project {
 	"template": boolean,
 	"at": string,
 	"created_at": string,
-	"color": string, 
+	"color": string,
 	"auto_estimates": boolean,
 	"actual_hours": number,
 	"hex_color": string
@@ -32,7 +32,7 @@ async function itemChosen(item: Timer) {
     const workspaceID: string = await getWorkspaceID()
     const projects: Array<Project> = await getProjects(workspaceID)
     let projectID = 0
-    projects.forEach(project => {
+    projects.forEach((project) => {
         if (project.name == item.project) {
             projectID = project.id
         }
@@ -46,7 +46,7 @@ async function itemChosen(item: Timer) {
     await showHUD(`Timer for "${item.name}" started! 🎉`)
 }
 
-const timerArray = timers.map(timer => {
+const timerArray = timers.map((timer) => {
     return (
         <List.Item
             icon={Icon.Clock}

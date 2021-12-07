@@ -20,12 +20,11 @@ interface Project {
 	"template": boolean,
 	"at": string,
 	"created_at": string,
-	"color": string, 
+	"color": string,
 	"auto_estimates": boolean,
 	"actual_hours": number,
 	"hex_color": string
 }
-
 
 async function getProjects(workspaceID: string): Promise<Array<Project>> {
     const prefs: Preferences = getPreferenceValues()
@@ -47,7 +46,6 @@ async function getWorkspaceID(): Promise<string> {
     const prefs: Preferences = getPreferenceValues()
     const baseURL = "https://api.track.toggl.com/api/v8/workspaces"
     const auth = "Basic " + Buffer.from(prefs.apiToken + ":api_token").toString("base64")
-	
     const response = await fetch(baseURL, {
         method: "GET",
         headers: {

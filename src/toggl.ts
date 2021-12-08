@@ -6,6 +6,14 @@ interface Timer {
 	"project": number
 }
 
+interface TimerBody {
+    "time_entry": {
+        "description": string,
+        "pid": number,
+        "created_with": string
+    }
+}
+
 interface Preferences {
 	"apiToken": string
 }
@@ -26,25 +34,8 @@ interface Project {
 	"hex_color": string
 }
 
-async function getProjects(workspaceID: string): Promise<Array<Project>> {
+async function togglGet(baseURL: string) {
     const prefs: Preferences = getPreferenceValues()
-    const baseURL = `https://api.track.toggl.com/api/v8/workspaces/${workspaceID}/projects`
-    const auth = "Basic " + Buffer.from(prefs.apiToken + ":api_token").toString("base64")
-
-    const response = await fetch(baseURL, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": auth
-        },
-    })
-    const projects: any = await response.json()
-    return projects
-}
-
-async function getWorkspaceID(): Promise<string> {
-    const prefs: Preferences = getPreferenceValues()
-    const baseURL = "https://api.track.toggl.com/api/v8/workspaces"
     const auth = "Basic " + Buffer.from(prefs.apiToken + ":api_token").toString("base64")
     const response = await fetch(baseURL, {
         method: "GET",
@@ -53,22 +44,12 @@ async function getWorkspaceID(): Promise<string> {
             "Authorization": auth
         },
     })
-    const resJSON: any = await response.json()
-    const workspaceID = resJSON[0].id
-    return workspaceID
+    return await response.json()
 }
 
-async function startTimer(timerObject: Timer) {
+async function togglPost(baseURL: string, data: TimerBody) {
     const prefs: Preferences = getPreferenceValues()
     const auth = "Basic " + Buffer.from(prefs.apiToken + ":api_token").toString("base64")
-    const baseURL = "https://api.track.toggl.com/api/v8/time_entries/start"
-    const data = {
-        "time_entry": {
-            "description": timerObject.name,
-            "pid": timerObject.project,
-            "created_with": "toggl-unofficial"
-        }
-    }
     await fetch(baseURL, {
         method: "POST",
         headers: {
@@ -77,6 +58,31 @@ async function startTimer(timerObject: Timer) {
         },
         body: JSON.stringify(data),
     })
+}
+
+async function getProjects(workspaceID: string): Promise<Array<Project>> {
+    const baseURL = `https://api.track.toggl.com/api/v8/workspaces/${workspaceID}/projects`
+    const projects: unknown = await togglGet(baseURL)
+    return projects
+}
+
+async function getWorkspaceID(): Promise<string> {
+    const baseURL = "https://api.track.toggl.com/api/v8/workspaces"
+    const response = await togglGet(baseURL)
+    const workspaceID: string = response[0].id.toString()
+    return workspaceID
+}
+
+async function startTimer(timerObject: Timer) {
+    const baseURL = "https://api.track.toggl.com/api/v8/time_entries/start"
+    const data: TimerBody = {
+        "time_entry": {
+            "description": timerObject.name,
+            "pid": timerObject.project,
+            "created_with": "toggl-unofficial"
+        }
+    }
+    await togglPost(baseURL, data)
 }
 
 export { getProjects, getWorkspaceID, startTimer }

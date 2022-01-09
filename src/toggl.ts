@@ -53,6 +53,19 @@ interface Workspace {
     ical_enabled: boolean
 }
 
+interface EntryFromAPI {
+    "id": number,
+    "wid": number,
+    "pid": number,
+    "billable": boolean,
+    "start": string,
+    "stop": string,
+    "duration": number,
+    "description": string,
+    "tags": Array<string>,
+    "at": string
+}
+
 async function togglGet(baseURL: string) {
     const prefs: Preferences = getPreferenceValues()
     const auth = "Basic " + Buffer.from(prefs.apiToken + ":api_token").toString("base64")
@@ -81,10 +94,17 @@ async function togglPost(baseURL: string, data: TimerBody) {
 }
 
 function isProject(arg: unknown): arg is Array<Project> {
+    console.log(arg)
     return true
 }
 
 function isWorkspace(arg: unknown): arg is Array<Workspace> {
+    console.log(arg)
+    return true
+}
+
+function isEntries(arg: unknown): arg is Array<EntryFromAPI> {
+    console.log(arg)
     return true
 }
 
@@ -122,4 +142,23 @@ async function startTimer(timerObject: Timer) {
     await togglPost(baseURL, data)
 }
 
-export { getProjects, getWorkspaceID, startTimer }
+async function getTimers(): Promise<Array<EntryFromAPI>> {
+    const baseURL = "https://api.track.toggl.com/api/v8/time_entries?start_date="
+
+    const date = new Date()
+    const now = date.toISOString()
+    date.setDate(date.getDate() - 30)
+    const thirtyDaysAgo = date.toISOString()
+
+    const urlWithParams = baseURL + encodeURIComponent(thirtyDaysAgo) + "&end_date=" + encodeURIComponent(now)
+
+    const response = await togglGet(urlWithParams)
+    if (isEntries(response)) {
+        return response
+    }
+    else {
+        throw "Entries not valid!"
+    }
+}
+
+export { getProjects, getWorkspaceID, startTimer, getTimers }

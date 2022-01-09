@@ -1,15 +1,24 @@
 import { ActionPanel, Icon, List, showHUD } from "@raycast/api"
-import timers from "./timers"
-import { getProjects, getWorkspaceID, startTimer } from "./toggl"
+import { useEffect, useState } from "react"
+import { getProjects, getWorkspaceID, startTimer, getTimers } from "./toggl"
 
 interface Timer {
 	"name": string,
+    "pid": number,
 	"project": string
 }
 
-interface TimeEntry {
-	"name": string,
-	"project": number
+interface EntryFromAPI {
+    "id": number,
+    "wid": number,
+    "pid": number,
+    "billable": boolean,
+    "start": string,
+    "stop": string,
+    "duration": number,
+    "description": string,
+    "tags": Array<string>,
+    "at": string
 }
 
 interface Project {
@@ -29,45 +38,91 @@ interface Project {
 }
 
 async function itemChosen(item: Timer) {
-    const workspaceID: string = await getWorkspaceID()
-    const projects: Array<Project> = await getProjects(workspaceID)
-    let projectID = 0
-    projects.forEach((project) => {
-        if (project.name == item.project) {
-            projectID = project.id
-        }
-    }
-    )
-    const timeEntry: TimeEntry = {
+    const timeEntry = {
         "name": item.name,
-        "project": projectID
+        "project": item.pid
     }
     await startTimer(timeEntry)
     await showHUD(`Timer for "${item.name}" started! 🎉`)
 }
 
-const timerArray = timers.map((timer) => {
-    return (
-        <List.Item
-            icon={Icon.Clock}
-            title={timer.name}
-            accessoryTitle={timer.project}
-            actions={
-                <ActionPanel>
-                    <ActionPanel.Item
-                        title="Start Timer"
-                        onAction={() => itemChosen(timer)}
-                    />
-                </ActionPanel>
-            }
-        />
-    )
-})
+/*
+async function createTimerArray(timers: Array<Timer>) {
+    const timerArray = timers.map((timer: Timer) => {
+        return (
+            <List.Item
+                icon={Icon.Clock}
+                title={timer.name}
+                accessoryTitle={timer.project}
+                actions={
+                    <ActionPanel>
+                        <ActionPanel.Item
+                            title="Start Timer"
+                            onAction={() => itemChosen(timer)}
+                        />
+                    </ActionPanel>
+                }
+            />
+        )
+    })
+    return timerArray
+}
+*/
 
 export default function Command() {
+    const [timers, setTimers] = useState<Timer[]>()
+
+    useEffect(() => {
+        const getEntries = async () => {
+            const fullData: Array<EntryFromAPI> = await getTimers()
+            const workspaceID: string = await getWorkspaceID()
+            const projects: Array<Project> = await getProjects(workspaceID)
+            const newTimers: Array<Timer> = []
+
+            fullData.forEach((entry: EntryFromAPI) => {
+                const project = entry.pid
+                const description = entry.description
+                const timer: Timer = {
+                    "name": description,
+                    "pid": project,
+                    "project": ""
+                }
+                projects.forEach((proj) => {
+                    if (proj.id == project) {
+                        timer.project = proj.name
+                    }
+                })
+                const isAlreadyAdded = newTimers.some((item) => {
+                    return JSON.stringify(item) == JSON.stringify(timer)
+                })
+                if (!isAlreadyAdded) {
+                    newTimers.push(timer)
+                }
+            })
+            setTimers(newTimers)
+        }
+        getEntries()
+    }, [])
+
+
     return (
-        <List>
-            {timerArray}
+        <List isLoading={timers === undefined}>
+            {timers?.map((timer, index) => (
+                <List.Item
+                    key={index}
+                    icon={Icon.Clock}
+                    title={timer.name}
+                    accessoryTitle={timer.project}
+                    actions={
+                        <ActionPanel>
+                            <ActionPanel.Item
+                                title="Start Timer"
+                                onAction={() => itemChosen(timer)}
+                            />
+                        </ActionPanel>
+                    }
+                />
+            ))}
         </List>
     )
 }

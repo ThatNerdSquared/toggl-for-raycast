@@ -46,29 +46,6 @@ async function itemChosen(item: Timer) {
     await showHUD(`Timer for "${item.name}" started! 🎉`)
 }
 
-/*
-async function createTimerArray(timers: Array<Timer>) {
-    const timerArray = timers.map((timer: Timer) => {
-        return (
-            <List.Item
-                icon={Icon.Clock}
-                title={timer.name}
-                accessoryTitle={timer.project}
-                actions={
-                    <ActionPanel>
-                        <ActionPanel.Item
-                            title="Start Timer"
-                            onAction={() => itemChosen(timer)}
-                        />
-                    </ActionPanel>
-                }
-            />
-        )
-    })
-    return timerArray
-}
-*/
-
 export default function Command() {
     const [timers, setTimers] = useState<Timer[]>()
 

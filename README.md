@@ -4,9 +4,9 @@ This is a small extension I've built for [Raycast](https://raycast.com), designe
 
 ## Actions
 - Start Toggl Timer
-	- currently relies on a .ts file with an object of timers
-	- will rework to automatically grab recent entries/use user-set JSON file
+    - automatically retrieves unique time entries from the last 30 days
 - Stop Toggl Timer (not completed)
+- Create Toggl Timer (not completed)
 - Today's Toggl Stats (not completed)
 
 ## Preferences

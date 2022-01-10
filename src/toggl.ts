@@ -66,6 +66,21 @@ interface EntryFromAPI {
     "at": string
 }
 
+interface CurrentEntry {
+    data: {
+        id: number,
+        wid: number,
+        pid: number,
+        billable: boolean,
+        start: string,
+        duration: number,
+        description: string,
+        duronly: boolean,
+        at: string,
+        uid: number
+    }
+}
+
 async function togglGet(baseURL: string) {
     const prefs: Preferences = getPreferenceValues()
     const auth = "Basic " + Buffer.from(prefs.apiToken + ":api_token").toString("base64")
@@ -93,6 +108,18 @@ async function togglPost(baseURL: string, data: TimerBody) {
     })
 }
 
+async function togglPut(baseURL: string) {
+    const prefs: Preferences = getPreferenceValues()
+    const auth = "Basic " + Buffer.from(prefs.apiToken + ":api_token").toString("base64")
+    await fetch(baseURL, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": auth
+        }
+    })
+}
+
 function isProject(arg: unknown): arg is Array<Project> {
     console.log(arg)
     return true
@@ -104,6 +131,11 @@ function isWorkspace(arg: unknown): arg is Array<Workspace> {
 }
 
 function isEntries(arg: unknown): arg is Array<EntryFromAPI> {
+    console.log(arg)
+    return true
+}
+
+function isCurrentEntry(arg: unknown): arg is CurrentEntry {
     console.log(arg)
     return true
 }
@@ -161,4 +193,20 @@ async function getTimers(): Promise<Array<EntryFromAPI>> {
     }
 }
 
-export { getProjects, getWorkspaceID, startTimer, getTimers }
+async function getCurrentTimer(): Promise<CurrentEntry> {
+    const baseURL = "https://api.track.toggl.com/api/v8/time_entries/current"
+    const response = await togglGet(baseURL)
+    if (isCurrentEntry(response)) {
+        return response
+    }
+    else {
+        throw "Currently running entry not valid"
+    }
+}
+
+async function stopTimer(id: number) {
+    const baseURL = `https://api.track.toggl.com/api/v8/time_entries/${id}/stop`
+    await togglPut(baseURL)
+}
+
+export { getProjects, getWorkspaceID, startTimer, getTimers, getCurrentTimer, stopTimer }

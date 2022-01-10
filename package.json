@@ -12,7 +12,7 @@
       "title": "Start Timer",
       "description": "Start a Toggl timer from a list of unique timers used over the last 30 days.",
       "mode": "view"
-    }
+    },
     {
       "name": "stopTimer",
       "title": "Stop Running Timer",

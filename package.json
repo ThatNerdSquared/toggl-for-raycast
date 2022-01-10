@@ -8,11 +8,16 @@
   "license": "MIT",
   "commands": [
     {
-      "name": "index",
+      "name": "startTimer",
       "title": "Start Timer",
-      "subtitle": "",
-      "description": "Start a Toggl timer from a predefined list.",
+      "description": "Start a Toggl timer from a list of unique timers used over the last 30 days.",
       "mode": "view"
+    }
+    {
+      "name": "stopTimer",
+      "title": "Stop Running Timer",
+      "description": "Stop your currently running Toggl timer.",
+      "mode": "no-view"
     }
   ],
   "preferences": [

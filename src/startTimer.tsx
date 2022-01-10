@@ -51,7 +51,8 @@ export default function Command() {
 
     useEffect(() => {
         const getEntries = async () => {
-            const fullData: Array<EntryFromAPI> = await getTimers()
+            const data: Array<EntryFromAPI> = await getTimers()
+            const fullData = data.reverse()
             const workspaceID: string = await getWorkspaceID()
             const projects: Array<Project> = await getProjects(workspaceID)
             const newTimers: Array<Timer> = []

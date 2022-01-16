@@ -1,8 +1,8 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "toggl-unofficial",
-  "title": "Toggl Unofficial",
-  "description": "Start, stop, and view running Toggl timers! Not endorsed by Toggl in any way.",
+  "title": "Toggl (Unofficial)",
+  "description": "Start and stop Toggl timers! Not endorsed by Toggl in any way.",
   "icon": "command-icon.png",
   "author": "ThatNerd",
   "license": "MIT",
@@ -26,6 +26,7 @@
       "type": "textfield",
       "required": true,
       "title": "Toggl API Token",
+      "placeholder": "1a2b3c4d5e6f7g8h9i",
       "description": "The API token for your Toggl account."
     }
   ],

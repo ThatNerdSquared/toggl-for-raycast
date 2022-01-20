@@ -6,6 +6,7 @@ interface Timer {
   name: string;
   pid: number;
   project: string;
+  colour: string
 }
 
 interface EntryFromAPI {
@@ -64,10 +65,12 @@ export default function Command() {
           name: description,
           pid: project,
           project: "",
+          colour: ""
         };
         projects.forEach((proj) => {
           if (proj.id == project) {
             timer.project = proj.name;
+            timer.colour = proj.hex_color
           }
         });
         const isAlreadyAdded = newTimers.some((item) => {
@@ -87,7 +90,7 @@ export default function Command() {
       {timers?.map((timer, index) => (
         <List.Item
           key={index}
-          icon={Icon.Clock}
+          icon={{source: Icon.Clock, tintColor: timer.colour}}
           title={timer.name}
           accessoryTitle={timer.project}
           actions={

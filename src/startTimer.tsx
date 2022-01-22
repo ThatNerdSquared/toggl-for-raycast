@@ -1,12 +1,12 @@
-import { ActionPanel, Icon, List, showHUD } from "@raycast/api";
+import { ActionPanel, Icon, List, ListItem, showHUD } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { getProjects, getWorkspaceID, startTimer, getTimers } from "./toggl";
+import { getProjects, getWorkspaceID, startTimer, getTimers, stopTimer } from "./toggl";
 
 interface Timer {
   name: string;
   pid: number;
   project: string;
-  colour: string
+  colour: string;
 }
 
 interface EntryFromAPI {
@@ -47,6 +47,21 @@ async function itemChosen(item: Timer) {
   await showHUD(`Timer for "${item.name}" started! 🎉`);
 }
 
+const CreateNewAction = () => {
+  return (
+    <ListItem
+      key={0}
+      icon={Icon.ArrowRight}
+      title={"Create New Timer"}
+      actions={
+        <ActionPanel>
+          <ActionPanel.Item title="Create New Timer" onAction={() => console.log("test")} />
+        </ActionPanel>
+      }
+    />
+  );
+};
+
 export default function Command() {
   const [timers, setTimers] = useState<Timer[]>();
 
@@ -65,12 +80,12 @@ export default function Command() {
           name: description,
           pid: project,
           project: "",
-          colour: ""
+          colour: "",
         };
         projects.forEach((proj) => {
           if (proj.id == project) {
             timer.project = proj.name;
-            timer.colour = proj.hex_color
+            timer.colour = proj.hex_color;
           }
         });
         const isAlreadyAdded = newTimers.some((item) => {
@@ -87,19 +102,24 @@ export default function Command() {
 
   return (
     <List isLoading={timers === undefined}>
-      {timers?.map((timer, index) => (
-        <List.Item
-          key={index}
-          icon={{source: Icon.Clock, tintColor: timer.colour}}
-          title={timer.name}
-          accessoryTitle={timer.project}
-          actions={
-            <ActionPanel>
-              <ActionPanel.Item title="Start Timer" onAction={() => itemChosen(timer)} />
-            </ActionPanel>
-          }
-        />
-      ))}
+      <List.Section title="Actions">
+        <CreateNewAction />
+      </List.Section>
+      <List.Section title="Previous Timers">
+        {timers?.map((timer, index) => (
+          <List.Item
+            key={index}
+            icon={{ source: Icon.Clock, tintColor: timer.colour }}
+            title={timer.name}
+            accessoryTitle={timer.project}
+            actions={
+              <ActionPanel>
+                <ActionPanel.Item title="Start Timer" onAction={() => itemChosen(timer)} />
+              </ActionPanel>
+            }
+          />
+        ))}
+      </List.Section>
     </List>
   );
 }

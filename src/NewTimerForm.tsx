@@ -1,18 +1,16 @@
-import { ActionPanel, closeMainWindow, Form, FormValue, Icon, showHUD, SubmitFormAction } from "@raycast/api";
+import { ActionPanel, closeMainWindow, Form, Icon, showHUD, SubmitFormAction } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { getProjects, getWorkspaceID, startTimer, stopTimer } from "./toggl";
-import { Project, Timer } from "./types";
+import { getProjects, getWorkspaces, startTimer } from "./toggl";
+import { NewTimeEntry, Project } from "./types";
 
-async function submitForm(values) {
-  const timerObj: Timer = {
-    name: values.name,
-    pid: parseInt(values.project),
-    project: "",
-    colour: "",
+async function submitForm(values: NewTimeEntry) {
+  const timerObj = {
+    description: values.description,
+    pid: values.pid,
   };
   await closeMainWindow();
   await startTimer(timerObj);
-  await showHUD(`Timer for "${timerObj.name}" created! 🎉`);
+  await showHUD(`Timer for "${timerObj.description}" created! 🎉`);
 }
 
 export default function NewTimerForm() {
@@ -20,8 +18,8 @@ export default function NewTimerForm() {
 
   useEffect(() => {
     const getProj = async () => {
-      const wid = await getWorkspaceID();
-      const projectsList: Array<Project> = await getProjects(wid);
+      const workspaces = await getWorkspaces();
+      const projectsList: Array<Project> = await getProjects(workspaces[0].id.toString());
       setProjects(projectsList);
     };
     getProj();
@@ -31,12 +29,12 @@ export default function NewTimerForm() {
     <Form
       actions={
         <ActionPanel>
-          <SubmitFormAction title="Create New Timer" onSubmit={async (values) => submitForm(values)} />
+          <SubmitFormAction title="Create New Timer" onSubmit={async (values: NewTimeEntry) => submitForm(values)} />
         </ActionPanel>
       }
     >
-      <Form.TextField id="name" title="Timer Name" placeholder="Llama Taming" />
-      <Form.Dropdown id="project" title="Timer Project">
+      <Form.TextField id="description" title="Timer Name" placeholder="Llama Taming" />
+      <Form.Dropdown id="pid" title="Timer Project">
         {projects?.map((project) => (
           <Form.DropdownItem
             value={project.id.toString()}

@@ -1,11 +1,15 @@
 import { ActionPanel, Icon, List, ListItem, PushAction, showHUD } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { getProjects, getWorkspaceID, startTimer, getTimers } from "./toggl";
+import { getProjects, getWorkspaces, startTimer, getTimers } from "./toggl";
 import NewTimerForm from "./NewTimerForm";
-import { Project, State, Timer } from "./types";
+import { isProject, NewTimeEntry, Project, State, Timer, Workspace } from "./types";
 
 async function itemChosen(item: Timer) {
-  await startTimer(item);
+  const data: NewTimeEntry = {
+    description: item.description,
+    pid: item.pid,
+  };
+  await startTimer(data);
   await showHUD(`Timer for "${item.description}" started! 🎉`);
 }
 
@@ -31,8 +35,8 @@ export default function Command() {
     const getState = async () => {
       const data: Array<Timer> = await getTimers();
       const fullData = data.reverse();
-      const workspaceID: string = await getWorkspaceID();
-      const projects: Array<Project> = await getProjects(workspaceID);
+      const workspaces: Array<Workspace> = await getWorkspaces();
+      const projects: Array<Project> = await getProjects(workspaces[0].id.toString());
 
       const newTimers: Array<Timer> = [];
       fullData.forEach((entry: Timer) => {
@@ -46,7 +50,7 @@ export default function Command() {
 
       const newState = {
         timers: newTimers,
-        workspaceID: workspaceID,
+        workspaces: workspaces,
         projects: projects,
       };
       setState(newState);
@@ -56,7 +60,11 @@ export default function Command() {
 
   function getProjectFromTimer(timer: Timer): Project {
     const foundProj = state?.projects.filter((item: Project) => item.id == timer.pid);
-    return foundProj[0];
+    if (isProject(foundProj)) {
+      return foundProj[0];
+    } else {
+      throw "Corresponding project not found!";
+    }
   }
 
   return (

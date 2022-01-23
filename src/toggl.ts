@@ -1,6 +1,17 @@
 import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
-import { Timer, Preferences, Project, Workspace } from "./types";
+import {
+  CurrentEntry,
+  Timer,
+  Preferences,
+  Project,
+  Workspace,
+  NewTimeEntry,
+  isProject,
+  isWorkspace,
+  isTimer,
+  isCurrentEntry,
+} from "./types";
 
 async function togglGet(baseURL: string) {
   const prefs: Preferences = getPreferenceValues();
@@ -21,8 +32,8 @@ async function togglPost(
   data: {
     time_entry: {
       description: string;
-      pid: string;
-      created_with: "toggl-unofficial";
+      pid: number;
+      created_with: string;
     };
   }
 ) {
@@ -50,26 +61,6 @@ async function togglPut(baseURL: string) {
   });
 }
 
-function isProject(arg: unknown): arg is Array<Project> {
-  console.log(arg);
-  return true;
-}
-
-function isWorkspace(arg: unknown): arg is Array<Workspace> {
-  console.log(arg);
-  return true;
-}
-
-function isEntries(arg: unknown): arg is Array<EntryFromAPI> {
-  console.log(arg);
-  return true;
-}
-
-function isCurrentEntry(arg: unknown): arg is CurrentEntry {
-  console.log(arg);
-  return true;
-}
-
 async function getProjects(workspaceID: string): Promise<Array<Project>> {
   const baseURL = `https://api.track.toggl.com/api/v8/workspaces/${workspaceID}/projects`;
   const projects = await togglGet(baseURL);
@@ -80,17 +71,17 @@ async function getProjects(workspaceID: string): Promise<Array<Project>> {
   }
 }
 
-async function getWorkspaceID(): Promise<string> {
+async function getWorkspaces(): Promise<Array<Workspace>> {
   const baseURL = "https://api.track.toggl.com/api/v8/workspaces";
   const response = await togglGet(baseURL);
   if (isWorkspace(response)) {
-    return response[0].id.toString();
+    return response;
   } else {
     throw "Workspace array not valid!";
   }
 }
 
-async function startTimer(timerObject: Timer) {
+async function startTimer(timerObject: NewTimeEntry) {
   const baseURL = "https://api.track.toggl.com/api/v8/time_entries/start";
   const data = {
     time_entry: {
@@ -113,7 +104,7 @@ async function getTimers(): Promise<Array<Timer>> {
   const urlWithParams = baseURL + encodeURIComponent(thirtyDaysAgo) + "&end_date=" + encodeURIComponent(now);
 
   const response = await togglGet(urlWithParams);
-  if (isEntries(response)) {
+  if (isTimer(response)) {
     return response;
   } else {
     throw "Entries not valid!";
@@ -135,4 +126,4 @@ async function stopTimer(id: number) {
   await togglPut(baseURL);
 }
 
-export { getProjects, getWorkspaceID, startTimer, getTimers, getCurrentTimer, stopTimer };
+export { getProjects, getWorkspaces, startTimer, getTimers, getCurrentTimer, stopTimer };

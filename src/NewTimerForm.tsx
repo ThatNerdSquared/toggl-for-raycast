@@ -1,16 +1,24 @@
-import { ActionPanel, closeMainWindow, Form, Icon, showHUD, SubmitFormAction } from "@raycast/api";
+import { ActionPanel, closeMainWindow, Form, Icon, showHUD, SubmitFormAction, Toast, ToastStyle } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { getProjects, getWorkspaces, startTimer } from "./toggl";
 import { NewTimeEntry, Project } from "./types";
 
 async function submitForm(values: NewTimeEntry) {
-  const timerObj = {
-    description: values.description,
-    pid: values.pid,
-  };
-  await closeMainWindow();
-  await startTimer(timerObj);
-  await showHUD(`Timer for "${timerObj.description}" created! 🎉`);
+  if (values.description == "") {
+    const toast = new Toast({ style: ToastStyle.Failure, title: "No description was given!" });
+    await toast.show();
+  } else if (values.pid == -1) {
+    const toast = new Toast({ style: ToastStyle.Failure, title: "No project was selected!" });
+    await toast.show();
+  } else {
+    const timerObj = {
+      description: values.description,
+      pid: values.pid,
+    };
+    await closeMainWindow();
+    await startTimer(timerObj);
+    await showHUD(`Timer for "${timerObj.description}" created! 🎉`);
+  }
 }
 
 export default function NewTimerForm() {
@@ -20,6 +28,22 @@ export default function NewTimerForm() {
     const getProj = async () => {
       const workspaces = await getWorkspaces();
       const projectsList: Array<Project> = await getProjects(workspaces[0].id.toString());
+      const blankProj: Project = {
+        id: -1,
+        wid: workspaces[0].id,
+        name: "No Project",
+        billable: false,
+        is_private: false,
+        active: false,
+        template: false,
+        at: "",
+        created_at: "",
+        color: "",
+        auto_estimates: false,
+        actual_hours: -1,
+        hex_color: "",
+      };
+      projectsList.unshift(blankProj);
       setProjects(projectsList);
     };
     getProj();

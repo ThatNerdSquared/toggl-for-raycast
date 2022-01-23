@@ -69,6 +69,7 @@ export interface State {
   timers: Array<Timer>;
   workspaces: Array<Workspace>;
   projects: Array<Project>;
+  isTokenValid: boolean;
 }
 
 export interface NewTimeEntry {

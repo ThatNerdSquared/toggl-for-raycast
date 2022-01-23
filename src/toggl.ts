@@ -3,7 +3,9 @@ import fetch from "node-fetch";
 
 interface Timer {
   name: string;
-  project: number;
+  pid: number;
+  project: string;
+  colour: string;
 }
 
 interface TimerBody {
@@ -165,7 +167,7 @@ async function startTimer(timerObject: Timer) {
   const data: TimerBody = {
     time_entry: {
       description: timerObject.name,
-      pid: timerObject.project,
+      pid: timerObject.pid,
       created_with: "toggl-unofficial",
     },
   };

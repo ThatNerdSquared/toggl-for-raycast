@@ -1,6 +1,7 @@
-import { ActionPanel, Icon, List, ListItem, showHUD } from "@raycast/api";
+import { ActionPanel, Icon, List, ListItem, PushAction, showHUD } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { getProjects, getWorkspaceID, startTimer, getTimers, stopTimer } from "./toggl";
+import NewTimerForm from "./NewTimerForm";
 
 interface Timer {
   name: string;
@@ -55,7 +56,7 @@ const CreateNewAction = () => {
       title={"Create New Timer"}
       actions={
         <ActionPanel>
-          <ActionPanel.Item title="Create New Timer" onAction={() => console.log("test")} />
+          <PushAction title="Create New Timer" target={<NewTimerForm />} />
         </ActionPanel>
       }
     />

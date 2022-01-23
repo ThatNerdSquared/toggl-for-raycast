@@ -1,51 +1,12 @@
 import { ActionPanel, Icon, List, ListItem, PushAction, showHUD } from "@raycast/api";
 import { useEffect, useState } from "react";
-import { getProjects, getWorkspaceID, startTimer, getTimers, stopTimer } from "./toggl";
+import { getProjects, getWorkspaceID, startTimer, getTimers } from "./toggl";
 import NewTimerForm from "./NewTimerForm";
-
-interface Timer {
-  name: string;
-  pid: number;
-  project: string;
-  colour: string;
-}
-
-interface EntryFromAPI {
-  id: number;
-  wid: number;
-  pid: number;
-  billable: boolean;
-  start: string;
-  stop: string;
-  duration: number;
-  description: string;
-  tags: Array<string>;
-  at: string;
-}
-
-interface Project {
-  id: number;
-  wid: number;
-  name: string;
-  billable: boolean;
-  is_private: boolean;
-  active: boolean;
-  template: boolean;
-  at: string;
-  created_at: string;
-  color: string;
-  auto_estimates: boolean;
-  actual_hours: number;
-  hex_color: string;
-}
+import { Project, State, Timer } from "./types";
 
 async function itemChosen(item: Timer) {
-  const timeEntry = {
-    name: item.name,
-    project: item.pid,
-  };
-  await startTimer(timeEntry);
-  await showHUD(`Timer for "${item.name}" started! 🎉`);
+  await startTimer(item);
+  await showHUD(`Timer for "${item.description}" started! 🎉`);
 }
 
 const CreateNewAction = () => {
@@ -64,55 +25,52 @@ const CreateNewAction = () => {
 };
 
 export default function Command() {
-  const [timers, setTimers] = useState<Timer[]>();
+  const [state, setState] = useState<State>();
 
   useEffect(() => {
-    const getEntries = async () => {
-      const data: Array<EntryFromAPI> = await getTimers();
+    const getState = async () => {
+      const data: Array<Timer> = await getTimers();
       const fullData = data.reverse();
       const workspaceID: string = await getWorkspaceID();
       const projects: Array<Project> = await getProjects(workspaceID);
-      const newTimers: Array<Timer> = [];
 
-      fullData.forEach((entry: EntryFromAPI) => {
-        const project = entry.pid;
-        const description = entry.description;
-        const timer: Timer = {
-          name: description,
-          pid: project,
-          project: "",
-          colour: "",
-        };
-        projects.forEach((proj) => {
-          if (proj.id == project) {
-            timer.project = proj.name;
-            timer.colour = proj.hex_color;
-          }
-        });
+      const newTimers: Array<Timer> = [];
+      fullData.forEach((entry: Timer) => {
         const isAlreadyAdded = newTimers.some((item) => {
-          return JSON.stringify(item) == JSON.stringify(timer);
+          return entry.pid == item.pid && entry.description == item.description;
         });
         if (!isAlreadyAdded) {
-          newTimers.push(timer);
+          newTimers.push(entry);
         }
       });
-      setTimers(newTimers);
+
+      const newState = {
+        timers: newTimers,
+        workspaceID: workspaceID,
+        projects: projects,
+      };
+      setState(newState);
     };
-    getEntries();
+    getState();
   }, []);
 
+  function getProjectFromTimer(timer: Timer): Project {
+    const foundProj = state?.projects.filter((item: Project) => item.id == timer.pid);
+    return foundProj[0];
+  }
+
   return (
-    <List isLoading={timers === undefined}>
+    <List isLoading={state === undefined}>
       <List.Section title="Actions">
         <CreateNewAction />
       </List.Section>
       <List.Section title="Previous Timers">
-        {timers?.map((timer, index) => (
+        {state?.timers?.map((timer, index) => (
           <List.Item
             key={index}
-            icon={{ source: Icon.Clock, tintColor: timer.colour }}
-            title={timer.name}
-            accessoryTitle={timer.project}
+            icon={{ source: Icon.Clock, tintColor: getProjectFromTimer(timer).hex_color }}
+            title={timer.description}
+            accessoryTitle={getProjectFromTimer(timer).name}
             actions={
               <ActionPanel>
                 <ActionPanel.Item title="Start Timer" onAction={() => itemChosen(timer)} />

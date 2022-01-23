@@ -1,29 +1,7 @@
 import { ActionPanel, closeMainWindow, Form, FormValue, Icon, showHUD, SubmitFormAction } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { getProjects, getWorkspaceID, startTimer, stopTimer } from "./toggl";
-
-interface Project {
-  id: number;
-  wid: number;
-  name: string;
-  billable: boolean;
-  is_private: boolean;
-  active: boolean;
-  template: boolean;
-  at: string;
-  created_at: string;
-  color: string;
-  auto_estimates: boolean;
-  actual_hours: number;
-  hex_color: string;
-}
-
-interface Timer {
-  name: string;
-  pid: number;
-  project: string;
-  colour: string;
-}
+import { Project, Timer } from "./types";
 
 async function submitForm(values) {
   const timerObj: Timer = {

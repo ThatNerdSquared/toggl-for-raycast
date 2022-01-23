@@ -1,20 +1,6 @@
 import { closeMainWindow, showHUD } from "@raycast/api";
 import { getCurrentTimer, stopTimer } from "./toggl";
-
-interface CurrentEntry {
-  data: {
-    id: number;
-    wid: number;
-    pid: number;
-    billable: boolean;
-    start: string;
-    duration: number;
-    description: string;
-    duronly: boolean;
-    at: string;
-    uid: number;
-  };
-}
+import { CurrentEntry } from "./types";
 
 export default async () => {
   await closeMainWindow();

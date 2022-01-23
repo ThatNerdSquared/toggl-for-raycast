@@ -1,87 +1,6 @@
 import { getPreferenceValues } from "@raycast/api";
 import fetch from "node-fetch";
-
-interface Timer {
-  name: string;
-  pid: number;
-  project: string;
-  colour: string;
-}
-
-interface TimerBody {
-  time_entry: {
-    description: string;
-    pid: number;
-    created_with: string;
-  };
-}
-
-interface Preferences {
-  apiToken: string;
-}
-
-interface Project {
-  id: number;
-  wid: number;
-  name: string;
-  billable: boolean;
-  is_private: boolean;
-  active: boolean;
-  template: boolean;
-  at: string;
-  created_at: string;
-  color: string;
-  auto_estimates: boolean;
-  actual_hours: number;
-  hex_color: string;
-}
-
-interface Workspace {
-  id: number;
-  name: string;
-  profile: number;
-  premium: boolean;
-  admin: boolean;
-  default_hourly_rate: number;
-  default_currency: string;
-  only_admins_may_create_projects: boolean;
-  only_admins_see_billable_rates: boolean;
-  only_admins_see_team_dashboard: boolean;
-  projects_billable_by_default: boolean;
-  rounding: number;
-  rounding_minutes: number;
-  api_token: string;
-  at: string;
-  ical_enabled: boolean;
-}
-
-interface EntryFromAPI {
-  id: number;
-  wid: number;
-  pid: number;
-  billable: boolean;
-  start: string;
-  stop: string;
-  duration: number;
-  description: string;
-  tags: Array<string>;
-  at: string;
-}
-
-interface CurrentEntry {
-  data: {
-    id: number;
-    wid: number;
-    pid: number;
-    billable: boolean;
-    start: string;
-    duration: number;
-    description: string;
-    duronly: boolean;
-    at: string;
-    uid: number;
-  };
-}
+import { Timer, Preferences, Project, Workspace } from "./types";
 
 async function togglGet(baseURL: string) {
   const prefs: Preferences = getPreferenceValues();
@@ -97,7 +16,16 @@ async function togglGet(baseURL: string) {
   return resJSON;
 }
 
-async function togglPost(baseURL: string, data: TimerBody) {
+async function togglPost(
+  baseURL: string,
+  data: {
+    time_entry: {
+      description: string;
+      pid: string;
+      created_with: "toggl-unofficial";
+    };
+  }
+) {
   const prefs: Preferences = getPreferenceValues();
   const auth = "Basic " + Buffer.from(prefs.apiToken + ":api_token").toString("base64");
   await fetch(baseURL, {
@@ -164,9 +92,9 @@ async function getWorkspaceID(): Promise<string> {
 
 async function startTimer(timerObject: Timer) {
   const baseURL = "https://api.track.toggl.com/api/v8/time_entries/start";
-  const data: TimerBody = {
+  const data = {
     time_entry: {
-      description: timerObject.name,
+      description: timerObject.description,
       pid: timerObject.pid,
       created_with: "toggl-unofficial",
     },
@@ -174,7 +102,7 @@ async function startTimer(timerObject: Timer) {
   await togglPost(baseURL, data);
 }
 
-async function getTimers(): Promise<Array<EntryFromAPI>> {
+async function getTimers(): Promise<Array<Timer>> {
   const baseURL = "https://api.track.toggl.com/api/v8/time_entries?start_date=";
 
   const date = new Date();

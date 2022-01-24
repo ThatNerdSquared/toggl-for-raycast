@@ -78,21 +78,17 @@ export interface NewTimeEntry {
 }
 
 export function isProject(arg: unknown): arg is Array<Project> {
-  console.log(arg);
   return true;
 }
 
 export function isWorkspace(arg: unknown): arg is Array<Workspace> {
-  console.log(arg);
   return true;
 }
 
 export function isTimer(arg: unknown): arg is Array<Timer> {
-  console.log(arg);
   return true;
 }
 
 export function isCurrentEntry(arg: unknown): arg is CurrentEntry {
-  console.log(arg);
   return true;
 }

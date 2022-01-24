@@ -27,7 +27,11 @@ export default function CreateTimer() {
   useEffect(() => {
     const getProj = async () => {
       const workspaces = await getWorkspaces();
-      const projectsList: Array<Project> = await getProjects(workspaces[0].id.toString());
+      const projects: Array<Project> = [];
+      workspaces.forEach(async (w, index) => {
+        const projs = await getProjects(workspaces[index].id.toString());
+        projs.forEach((w) => projects.push(w));
+      });
       const blankProj: Project = {
         id: -1,
         wid: workspaces[0].id,
@@ -43,8 +47,8 @@ export default function CreateTimer() {
         actual_hours: -1,
         hex_color: "",
       };
-      projectsList.unshift(blankProj);
-      setProjects(projectsList);
+      projects.unshift(blankProj);
+      setProjects(projects);
     };
     getProj();
   }, []);

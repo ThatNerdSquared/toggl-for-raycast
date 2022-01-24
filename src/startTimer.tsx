@@ -32,21 +32,26 @@ export default function Command() {
   const [state, setState] = useState<State>();
 
   useEffect(() => {
-    const initialData: State = {
-      timers: [],
-      workspaces: [],
-      projects: [],
-      isTokenValid: true,
-    };
-    setState(initialData);
-    const getState = async () => {
+    async function getState() {
+      const initialData: State = {
+        timers: [],
+        workspaces: [],
+        projects: [],
+        isTokenValid: true,
+      };
+      setState(initialData);
       try {
+        const newTimers: Array<Timer> = [];
+        const workspaces: Array<Workspace> = await getWorkspaces();
+        const projects: Array<Project> = [];
+        workspaces.forEach(async (w, index) => {
+          const projs = await getProjects(workspaces[index].id.toString());
+          projs.forEach((w) => projects.push(w));
+        });
+
         const data: Array<Timer> = await getTimers();
         const fullData = data.reverse();
-        const workspaces: Array<Workspace> = await getWorkspaces();
-        const projects: Array<Project> = await getProjects(workspaces[0].id.toString());
 
-        const newTimers: Array<Timer> = [];
         fullData.forEach((entry: Timer) => {
           const isAlreadyAdded = newTimers.some((item) => {
             return entry.pid == item.pid && entry.description == item.description;
@@ -74,7 +79,7 @@ export default function Command() {
           setState(newState);
         }
       }
-    };
+    }
     getState();
   }, []);
 
@@ -88,7 +93,7 @@ export default function Command() {
   }
 
   return (
-    <List isLoading={state === undefined}>
+    <List isLoading={state == undefined}>
       {!state?.isTokenValid ? (
         <List.Item key={0} icon={{ source: Icon.ExclamationMark, tintColor: Color.Red }} title={"Invalid Token!"} />
       ) : (

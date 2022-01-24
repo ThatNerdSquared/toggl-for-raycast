@@ -22,11 +22,11 @@
       "mode": "no-view"
     },
     {
-        "name": "createTimer",
-        "title": "Create New Timer",
-        "subtitle": "Toggl",
-        "description": "Create a new Toggl timer.",
-        "mode": "view"
+      "name": "createTimer",
+      "title": "Create New Timer",
+      "subtitle": "Toggl",
+      "description": "Create a new Toggl timer.",
+      "mode": "view"
     }
   ],
   "preferences": [

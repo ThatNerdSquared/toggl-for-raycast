@@ -1,7 +1,7 @@
 import { ActionPanel, Color, Icon, List, ListItem, ListSection, PushAction, showHUD } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { getProjects, getWorkspaces, startTimer, getTimers } from "./toggl";
-import NewTimerForm from "./NewTimerForm";
+import CreateTimer from "./createTimer";
 import { isProject, NewTimeEntry, Project, State, Timer, Workspace } from "./types";
 
 async function itemChosen(item: Timer) {
@@ -21,7 +21,7 @@ const CreateNewAction = () => {
       title={"Create New Timer"}
       actions={
         <ActionPanel>
-          <PushAction title="Create New Timer" target={<NewTimerForm />} />
+          <PushAction title="Create New Timer" target={<CreateTimer />} />
         </ActionPanel>
       }
     />

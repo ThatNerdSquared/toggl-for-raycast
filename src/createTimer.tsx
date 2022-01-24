@@ -21,7 +21,7 @@ async function submitForm(values: NewTimeEntry) {
   }
 }
 
-export default function NewTimerForm() {
+export default function CreateTimer() {
   const [projects, setProjects] = useState<Array<Project>>();
 
   useEffect(() => {
